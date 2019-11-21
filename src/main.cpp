@@ -1,9 +1,12 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <assert.h>
+
 #include "debugger.h"
 
 int main(int argc, char * argv[]) {
+  assert(argc >= 2);
   /* TODO start debugee
      read CFG
      place int3 instructions

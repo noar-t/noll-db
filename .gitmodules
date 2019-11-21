@@ -1,0 +1,4 @@
+[submodule "libelfin"]
+	path = libelfin
+	url = git@github.com:aclements/libelfin.git
+	branch = master

@@ -2,10 +2,11 @@
 #define DEBUGGER_H
 
 #include <string>
+
 #include <unistd.h>
 
-#include <elf++.hh>
-#include <dwarf++.hh>
+#include "elf/elf++.hh"
+#include "dwarf/dwarf++.hh"
 
 class debugger  {
   public:
@@ -16,15 +17,17 @@ class debugger  {
     void run();
 
   private:
-    void wait();
     void init_dwarf_data();
+    void init_debugee();
+    void wait();
     void continue_debugee();
 
     char ** argv;
-    std::string executable;
+    char * executable;
+    int executable_fd;
     pid_t pid;
-    dwarf::dwarf exe_dwarf;
     elf::elf exe_elf;
+    dwarf::dwarf exe_dwarf;
 };
 
 #endif
