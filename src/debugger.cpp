@@ -1,31 +1,17 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <inttypes.h>
 #include <fcntl.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
 #include "debugger.h"
+#include "breakpoint.h"
 
 void debugger::init() {
   init_dwarf_data();
   init_debugee();
-}
-
-void debugger::wait() {
-  int wait_status = 0;
-  int options = 0;
-
-  waitpid(pid, &wait_status, 0);
-}
-
-void debugger::run() {
-  return;
-}
-
-void debugger::continue_debugee() {
-  ptrace(PTRACE_CONT, pid, nullptr, nullptr);
-  wait();
 }
 
 void debugger::init_dwarf_data() {
@@ -49,3 +35,43 @@ void debugger::init_debugee() {
 
   wait();
 }
+
+void debugger::wait() {
+  int wait_status = 0;
+  int options = 0;
+
+  waitpid(pid, &wait_status, 0);
+}
+
+void debugger::run() {
+  continue_debugee();
+  return;
+}
+
+void debugger::continue_debugee() {
+  ptrace(PTRACE_CONT, pid, nullptr, nullptr);
+  wait();
+}
+
+void debugger::set_breakpoint(std::intptr_t addr) {
+  std::cout << "setting breakpoint\n";
+  breakpoint b(pid, addr);
+  b.enable();
+  breakpoint_map.insert({addr, b});
+}
+
+void debugger::dump_line_table() {
+  for (auto cu : exe_dwarf.compilation_units()) {
+    printf("--- <%x>\n", (unsigned int)cu.get_section_offset());
+    dwarf::line_table lt = cu.get_line_table();
+    for (auto &line : lt) {
+      if (line.end_sequence)
+        printf("\n");
+      else
+        printf("%-40s%8d%#20" PRIx64 "\n", line.file->path.c_str(),
+            line.line, line.address);
+    }
+    printf("\n");
+  }
+}
+
