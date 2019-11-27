@@ -75,3 +75,9 @@ void debugger::dump_line_table() {
   }
 }
 
+void debugger::dump_cus() {
+  for (auto cu : exe_dwarf.compilation_units()) {
+    std::cout << "unit" << '\n';//cu.abbrev_entry() << '\n';
+  }
+}
+

@@ -20,6 +20,8 @@ int main(int argc, char * argv[]) {
   std::intptr_t addr = 0x401be5;
   d.set_breakpoint(addr);
   d.run();
+  d.dump_line_table();
+  d.dump_cus();
  // d.dump_line_table();
   std::cout << "sleeping\n";
   sleep(3);
