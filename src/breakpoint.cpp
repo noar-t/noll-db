@@ -8,14 +8,15 @@ void breakpoint::enable() {
   if (enabled) // TODO produce an error
     return;
 
-  std::cout << "Inserting breakpoint @: " << std::hex << addr << '\n';
   long inst = ptrace(PTRACE_PEEKDATA, pid, addr, nullptr);
-  std::cout << "\tPeekdata: " << std::hex << inst << '\n';
-  orig_inst = inst * 0xff;
+  orig_inst = inst & 0xff;
   const static uint64_t int3 = 0xcc;
+  std::cerr << "peek data" << std::hex << inst << "\n";
   inst = ((inst & ~0xff) | int3);
+  std::cerr << "poke data" << std::hex << inst << "\n";
   ptrace(PTRACE_POKEDATA, pid, addr, inst);
-  std::cout << "\tPokedata: " << std::hex << inst << '\n';
+  long old_inst = ((inst & ~0xff) | orig_inst);
+  std::cerr << "unpoke data" << std::hex << old_inst << "\n";
   enabled = true;
 }
 
